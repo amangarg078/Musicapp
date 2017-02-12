@@ -1,0 +1,89 @@
+{% extends 'app/base.html'%}
+{% load staticfiles%}
+{% block content %}
+<div class="container page-header hpad">
+<div class="row">
+<div class="col-md-3">
+</div>
+<div class="col-md-6 cent body">
+
+<h1>   Music Tracks </h1>
+<form method="GET" action="{% url 'index' %}">
+	<div class="form-inline">
+    <input type="text" name="name" title="Name" placeholder="Search Title" value="{{ request.GET.name }}" class="form-control">
+
+
+<button class="btn btn-default" type="submit" value="Search" >Search </button>
+
+	<br/>
+</div>
+</form>
+
+{% if count == 0 %}
+<h4> No Result Found </h4>
+{% endif %}
+
+<ul class="posts ">
+{% for i in result%}
+<li class="post post-content"> 
+<div class="UpperTitle">
+
+<span style="float: left"> <a href="{% url 'edit_track' i.id %}"> {{i.title}} &nbsp; </a></span>
+<span style="float: left"> [
+    {{ i.get_genre }}
+]
+</span>
+<span style="float: right;">
+    {%  for j in i.get_rating %}
+        <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+    {%  endfor %}
+ {%  for j in i.get_empty_rating %}
+        <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+    {%  endfor %}
+</span>
+
+</div>
+</li>
+
+{% endfor %}
+<br>
+<div class="btn-group btn-group-justified" role="group" aria-label="...">
+      <div class="btn-group" role="group">
+   <span class="btn" ></span>
+  </div>
+  <div class="btn-group" role="group">
+   <a href="{% url 'add_track' %}" style="color:white;"><span class="btn btn-success" > Add a Track</span></a>
+  </div>
+       <div class="btn-group" role="group">
+   <span class="btn" ></span>
+  </div>
+</div>
+	
+<br>
+
+{% if result.has_other_pages %}
+  <ul class="pagination">
+    {% if result.has_previous %}
+      <li><a href="?page={{ result.previous_page_number }}">&laquo;</a></li>
+    {% else %}
+      <li class="disabled"><span>&laquo;</span></li>
+    {% endif %}
+    {% for i in result.paginator.page_range %}
+      {% if result.number == i %}
+        <li class="active"><span>Page {{ i }} <span class="sr-only">(current)</span></span></li>
+      {% else %}
+        <li><a href="?page={{ i }}">Page {{ i }}</a></li>
+      {% endif %}
+    {% endfor %}
+    {% if result.has_next %}
+      <li><a href="?page={{ result.next_page_number }}">&raquo;</a></li>
+    {% else %}
+      <li class="disabled"><span>&raquo;</span></li>
+    {% endif %}
+  </ul>
+{% endif %}
+</div>
+</div>
+</div>
+
+{% endblock %}
