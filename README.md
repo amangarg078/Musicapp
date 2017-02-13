@@ -4,17 +4,19 @@ This is a django application that stores tracks and genres. User can see list of
 
 Each action also has a corresponding REST Api which can be used to perform these operations.
 
+The application is hosted at: http://aman078.pythonanywhere.com/app/ 
+
 <b>API Documentation</b>
 
 Genre
 
 List all Genres
 
-Http GET to http://104.197.128.152:8000/v1/genres
+Http GET to http://localhost:8000/app/v1/genres
 ```
 {
     "count": 531,
-    "next": "http://104.197.128.152:8000/v1/genres?page=2",
+    "next": "http://localhost:8000/app/v1/genres?page=2",
     "previous": null,
     "results": [
  
@@ -40,7 +42,7 @@ Http GET to http://104.197.128.152:8000/v1/genres
 
 Get single Genre record
 
-Http GET to http://104.197.128.152:8000/v1/genres/11
+Http GET to http://localhost:8000/app/v1/genres/11
 
 ```
 {
@@ -52,7 +54,7 @@ Http GET to http://104.197.128.152:8000/v1/genres/11
 
 Edit Genre Record
 
-Http POST to http://104.197.128.152:8000/v1/genres/11
+Http POST to http://localhost:8000/app/v1/genres/11
 
 Accepted response
 
@@ -66,7 +68,7 @@ Accepted response
 
 Create new Genre
 
-Http POST to http://104.197.128.152:8000/v1/genres
+Http POST to http://localhost:8000/app/v1/genres
 
 Accepted response
 
@@ -81,12 +83,12 @@ Track
 
 List all Tracks
 
-Http GET to http://104.197.128.152:8000/v1/tracks
+Http GET to http://localhost:8000/app/v1/tracks
 
 ```
 {
     "count": 362,
-    "next": "http://104.197.128.152:8000/v1/tracks?page=2",
+    "next": "http://localhost:8000/app/v1/tracks?page=2",
     "previous": null,
     "results": [
         {
@@ -134,7 +136,7 @@ Http GET to http://104.197.128.152:8000/v1/tracks
 
 Search Tracks with title
 
-Http GET to http://104.197.128.152:8000/v1/tracks?title=Hymn%20for%20the%20weekend
+Http GET to http://localhost:8000/app/v1/tracks?title=Hymn%20for%20the%20weekend
 
 ```
 {
@@ -160,7 +162,7 @@ Http GET to http://104.197.128.152:8000/v1/tracks?title=Hymn%20for%20the%20weeke
 
 Get single Track record
 
-Http GET to http://104.197.128.152:8000/v1/tracks/44
+Http GET to http://localhost:8000/app/v1/tracks/44
 
 ```
 {
@@ -186,7 +188,7 @@ Http GET to http://104.197.128.152:8000/v1/tracks/44
  
 Edit Track Record
 
-Http POST to http://104.197.128.152:8000/v1/tracks/1
+Http POST to http://localhost:8000/app/v1/tracks/1
 
 Accepted response
 ```
@@ -202,7 +204,7 @@ Accepted response
 
 Create new Track
 
-Http POST to http://104.197.128.152:8000/v1/tracks
+Http POST to http://localhost:8000/app/v1/tracks
 
 Accepted response
 ```
