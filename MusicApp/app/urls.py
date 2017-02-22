@@ -8,8 +8,6 @@ urlpatterns=[
     url(r'^$', views.index, name='index'),
     url(r'^v1/', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    #url(r'^v1/tracks/$', views.track_list, name='track_list'),
-    #url(r'^v1/tracks/(?P<pk>[0-9]+)$', views.track_detail, name='track_detail'),
     url(r'^addtrack/$',views.add_track, name='add_track'),
     url(r'^addgenre/$',views.add_genre, name='add_genre'),
     url(r'^genre/$',views.genrelist, name='genre_list'),

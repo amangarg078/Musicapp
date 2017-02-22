@@ -30,14 +30,15 @@
 
 <span style="float: left"> <a href="{% url 'edit_track' i.id %}"> {{i.title}} &nbsp; </a></span>
 <span style="float: left"> [
-    {{ i.get_genre }}
+    {{ i.genre_list }}
 ]
 </span>
 <span style="float: right;">
-    {%  for j in i.get_rating %}
+
+    {%  for j in i.rating %}
         <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
     {%  endfor %}
- {%  for j in i.get_empty_rating %}
+ {%  for j in i.rating_empty%}
         <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
     {%  endfor %}
 </span>

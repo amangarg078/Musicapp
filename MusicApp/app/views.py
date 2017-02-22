@@ -20,8 +20,21 @@ from .serializers import TrackSerializer, GenreSerializer, GetTrackSerializer
 def index(request):
     form = QueryForm()
     count = -1
+    host = request.get_host()
+    r = requests.get('http://%s/app/v1/tracks/' % host)
+    result = r.json()
 
-    result = Tracks.objects.all()
+    for i in result:
+        i['rating'] = int(float(i['rating']))
+        i['rating_empty'] = range(5 - i['rating'])
+        i['rating'] = range(i['rating'])
+
+    for i in result:
+        list = []
+        for j in i['genres']:
+            list.append(j['name'])
+        i['genre_list'] = " | ".join(list)
+
     paginator = Paginator(result, 5)
     page = request.GET.get('page')
     try:
@@ -35,19 +48,28 @@ def index(request):
     if request.GET.get('name'):
         name = request.GET.get('name')
         # name=re.findall('\w+',name)
-
-        result = Tracks.objects.filter(title__icontains=name)
-        count=len(result)
+        r = requests.get('http://%s/app/v1/tracks/?title=%s' % (host, name))
+        result = r.json()['results']
+        count = len(result)
         return render(request, 'app/index.html', {'result': result, 'count': count, 'form': form})
-    count=len(result)
+    count = len(result)
+
     return render(request, 'app/index.html', {'form': form, 'count': count, 'result': result})
 
 
 def add_track(request):
+    host = request.get_host()
     if request.method == 'POST':
         form = TrackForm(request.POST)
         if form.is_valid():
-            s = form.save()
+            title = form.cleaned_data['title']
+            rating = form.cleaned_data['rating']
+            genre_set = form.cleaned_data['genres']
+            genres = []
+            for i in genre_set:
+                genres.append(i.id)
+            r = requests.post('http://%s/app/v1/tracks/' % host,
+                              data={'title': title, 'rating': rating, 'genres': genres})
 
             return HttpResponseRedirect(reverse('index'))
         else:
@@ -58,11 +80,12 @@ def add_track(request):
 
 
 def add_genre(request):
+    host = request.get_host()
     if request.method == 'POST':
         form = GenreForm(request.POST)
         if form.is_valid():
-            s = form.save()
-
+            name = form.cleaned_data['name']
+            r = requests.post('http://%s/app/v1/genres/' % host, data={'name': name})
             return HttpResponseRedirect(reverse('genre_list'))
         else:
             print form.errors
@@ -72,7 +95,9 @@ def add_genre(request):
 
 
 def genrelist(request):
-    result = Genres.objects.all()
+    host = request.get_host()
+    r = requests.get('http://%s/app/v1/genres/' % host)
+    result = r.json()
     paginator = Paginator(result, 5)
     page = request.GET.get('page')
     try:
@@ -85,27 +110,40 @@ def genrelist(request):
         result = paginator.page(paginator.num_pages)
     return render(request, 'app/genrelist.html', {'result': result})
 
-def trackDetails(request,id):
-    track=get_object_or_404(Tracks,pk=id)
+
+def trackDetails(request, id):
+    host = request.get_host()
+    track = get_object_or_404(Tracks, pk=id)
     if request.method == "POST":
         form = TrackForm(request.POST, instance=track)
         if form.is_valid():
-            post = form.save()
+            title = form.cleaned_data['title']
+            rating = form.cleaned_data['rating']
+            genre_set = form.cleaned_data['genres']
+            genres = []
+            for i in genre_set:
+                genres.append(i.id)
+            r = requests.put('http://%s/app/v1/tracks/' % host,
+                             data={'title': title, 'rating': rating, 'genres': genres})
+
             return HttpResponseRedirect(reverse('index'))
     else:
         form = TrackForm(instance=track)
-    return render(request,'app/trackdetails.html',{'track':track,'form':form})
+    return render(request, 'app/trackdetails.html', {'track': track, 'form': form})
 
-def genreDetails(request,id):
-    genre=get_object_or_404(Genres,pk=id)
+
+def genreDetails(request, id):
+    host = request.get_host()
+    genre = get_object_or_404(Genres, pk=id)
     if request.method == "POST":
         form = GenreForm(request.POST, instance=genre)
         if form.is_valid():
-            post = form.save()
+            name = form.cleaned_data['name']
+            r = requests.put('http://%s/app/v1/genres/%s/' % (host, id), data={'name': name})
             return HttpResponseRedirect(reverse('genre_list'))
     else:
         form = GenreForm(instance=genre)
-    return render(request,'app/genredetails.html',{'genre':genre,'form':form})
+    return render(request, 'app/genredetails.html', {'genre': genre, 'form': form})
 
 
 class GenreViewSet(viewsets.ModelViewSet):
@@ -118,65 +156,14 @@ class GenreViewSet(viewsets.ModelViewSet):
 
 class TracksViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows genre to be viewed or edited.
+    API endpoint that allows track to be viewed or edited.
     """
     filter_backends = (filters.DjangoFilterBackend,)
     filter_fields = ('title',)
     queryset = Tracks.objects.all().order_by('id')
-    serializer_class = TrackSerializer
 
+    def get_serializer_class(self):
+        if self.action == 'list' or self.action == 'retrieve':
+            return GetTrackSerializer
+        return TrackSerializer
 
-'''
-obsolete views
-
-@api_view(['GET', 'POST'])
-def track_list(request):
-    """
-    List all tasks, or create a new track.
-    """
-    if request.method == 'GET':
-        tracks = Tracks.objects.all()
-
-        """
-        Filtering on track title
-        """
-        title = request.query_params.get('title', None)
-        if title is not None:
-            tracks = tracks.filter(title__icontains=title)
-        serializer = GetTrackSerializer(tracks, many=True)
-        return Response(serializer.data)
-
-    elif request.method == 'POST':
-        serializer = TrackSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(
-                serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-@api_view(['GET', 'POST'])
-def track_detail(request, pk):
-    """
-    Get, udpate a specific track
-    """
-    try:
-        tracks = Tracks.objects.get(pk=pk)
-    except Tracks.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == 'GET':
-        serializer = GetTrackSerializer(tracks)
-        return Response(serializer.data)
-
-    elif request.method == 'POST':
-        serializer = TrackSerializer(tracks, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        else:
-            return Response(
-                serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-'''

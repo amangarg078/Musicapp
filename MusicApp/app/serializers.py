@@ -24,7 +24,7 @@ class TrackSerializer(serializers.ModelSerializer):
     # genre=GenreSerializer(source='genres_set',many=True)
     class Meta:
         model = Tracks
-        fields = ('id', 'title', 'rating', 'genres')
+        fields = ('title', 'rating', 'genres')
 
 
 
