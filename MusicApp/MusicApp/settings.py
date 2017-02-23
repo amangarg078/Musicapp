@@ -72,9 +72,9 @@ TEMPLATES = [
 WSGI_APPLICATION = 'MusicApp.wsgi.application'
 REST_FRAMEWORK = {
 
-    #'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
-    #'PAGE_SIZE': 5
+    'PAGE_SIZE': 5
 }
 
 # Database

@@ -36,22 +36,23 @@
 
 
 <br>
-{% if result.has_other_pages %}
+
+{% if pagination.has_other_pages %}
   <ul class="pagination">
-    {% if result.has_previous %}
-      <li><a href="?page={{ result.previous_page_number }}">&laquo;</a></li>
+    {% if pagination.prev %}
+      <li><a href="?page={{ pagination.prev }}">&laquo;</a></li>
     {% else %}
       <li class="disabled"><span>&laquo;</span></li>
     {% endif %}
-    {% for i in result.paginator.page_range %}
-      {% if result.number == i %}
+    {% for i in pagination.total_pages %}
+      {% if pagination.current == i %}
         <li class="active"><span>Page {{ i }} <span class="sr-only">(current)</span></span></li>
       {% else %}
         <li><a href="?page={{ i }}">Page {{ i }}</a></li>
       {% endif %}
     {% endfor %}
-    {% if result.has_next %}
-      <li><a href="?page={{ result.next_page_number }}">&raquo;</a></li>
+    {% if pagination.next %}
+      <li><a href="?page={{ pagination.next}}">&raquo;</a></li>
     {% else %}
       <li class="disabled"><span>&raquo;</span></li>
     {% endif %}
